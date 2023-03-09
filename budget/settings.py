@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-kra^g(c%phx^n#!749-#v=!0stoo%@jj_yc*1)ka+!948+u0hz
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['https://ovaomnis.pythonanywhere.com', 'http://localhost']
+ALLOWED_HOSTS = ['http://ovaomnis.pythonanywhere.com', 'http://localhost']
 
 # Application definition
 
