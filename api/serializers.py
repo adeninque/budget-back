@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.db.models import Sum
 from django.utils.text import slugify
+from datetime import datetime
 
 import shortuuid
 
@@ -34,7 +35,9 @@ class IncomeSerializer(SlugMixin, serializers.ModelSerializer):
       'wastes': wastes,
       'remains': data['budget'] - wastes
     })
-  
+
+    data['created'] = datetime.strftime(instance.created, '%Y-%m-%d at %H:%M')
+    
     return data
   
   def create(self, validated_data):

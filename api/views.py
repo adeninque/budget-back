@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from django.db.models import Count, Sum
-from rest_framework import mixins, viewsets, response, request, status
+from rest_framework import mixins, viewsets, response, request, status, views, permissions
 from rest_framework.decorators import action
+from rest_framework.authtoken.models import Token
 
 from .serializers import (IncomeSerializer,
                           CategorySerializer,
@@ -17,29 +18,14 @@ class IncomeViewSet(mixins.RetrieveModelMixin,
                     mixins.DestroyModelMixin,
                     viewsets.GenericViewSet,):
   serializer_class = IncomeSerializer
-  queryset = Income.objects.all()
+  queryset = Income.objects.all().order_by('created').reverse()
   lookup_field = 'slug'
   
-  # @action(detail=True, methods=['get'])
-  # def categories(self, requset: request.Request, slug: str):
-  #   queryset = Category.objects.filter(waste__income__slug = slug).distinct()
-  #   serializer = CategorySerializer(queryset, many = True)
-  #   data = serializer.data
-  #   for i in data:
-  #     i['total'] = Waste.objects.filter(income__slug = slug).filter(cat_id = i['id']).aggregate(sum = Sum('amount'))['sum']
-      
-  #   return response.Response(data)
-
 
 class NestedCategoryViewSet(viewsets.GenericViewSet):
   serializer_class = CategorySerializer
   queryset = Category.objects.all()
   lookup_field = 'slug'
-  
-  # @action(detail=True, methods = ['get'])
-  # def wastes(self, request: request.Request, slug: str, income_slug: str):
-  #   print(self.kwargs)
-  #   return response.Response([])
   
   def retrieve(self, request: request.Request, slug: str, income_slug: str):
     try:
@@ -104,7 +90,7 @@ class NestedWasteViewSet(
     return response.Response(serializer.data)
   
   def list(self, request: request.Request, income_slug, cat_slug):
-    queryset = Waste.objects.filter(income__slug = income_slug, cat__slug = cat_slug)
+    queryset = Waste.objects.filter(income__slug = income_slug, cat__slug = cat_slug).order_by('created').reverse()
     if not queryset:
       return response.Response({'error': 'list is empty'}, status=status.HTTP_404_NOT_FOUND)
     serializer = WasteSerializer(queryset, many=True)
@@ -129,3 +115,13 @@ class NestedWasteViewSet(
     serializer.save(income = income, cat = cat, creator = request.user)
     
     return response.Response({'good'})
+
+class WasteViewSet(mixins.UpdateModelMixin,
+                   viewsets.GenericViewSet):
+  queryset = Waste.objects.all()
+  serializer_class = WasteSerializer
+
+class VerifyToken(views.APIView):
+  permission_classes = [permissions.IsAuthenticated]
+  def get(self, request: request.Request):
+    return response.Response(['token valid'])

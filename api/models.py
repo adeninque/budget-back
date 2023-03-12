@@ -6,6 +6,7 @@ class Income(models.Model):
   title = models.CharField(max_length = 255)
   budget = models.IntegerField()
   created = models.DateTimeField(auto_now_add = True)
+  date = models.DateField(null=True)
   slug = models.SlugField(unique=True, null=False)
   
   def __str__(self):

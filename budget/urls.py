@@ -21,11 +21,14 @@ from rest_framework_nested import routers
 from api.views import (IncomeViewSet,
                        NestedCategoryViewSet,
                        CategoryViewSet,
-                       NestedWasteViewSet)
+                       NestedWasteViewSet,
+                       WasteViewSet,
+                       VerifyToken)
 
 routes = routers.SimpleRouter()
-routes.register('incomes', IncomeViewSet)
+routes.register(r'incomes', IncomeViewSet)
 routes.register(r'categories', CategoryViewSet)
+routes.register(r'wastes', WasteViewSet)
 
 incomes_routes = routers.NestedSimpleRouter(routes, r'incomes', lookup='income')
 incomes_routes.register(r'categories', NestedCategoryViewSet)
@@ -40,4 +43,5 @@ urlpatterns = [
     path('api/v1/', include(waste_routes.urls)),
     path('auth/', include('djoser.urls')),
     path('auth/', include('djoser.urls.authtoken')),
+    path('auth/token/verify/', VerifyToken.as_view(), name='verify_token')
 ]
