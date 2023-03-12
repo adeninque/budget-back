@@ -92,7 +92,7 @@ class NestedWasteViewSet(
   def list(self, request: request.Request, income_slug, cat_slug):
     queryset = Waste.objects.filter(income__slug = income_slug, cat__slug = cat_slug).order_by('created').reverse()
     if not queryset:
-      return response.Response({'error': 'list is empty'}, status=status.HTTP_404_NOT_FOUND)
+      return response.Response([])
     serializer = WasteSerializer(queryset, many=True)
     return response.Response(serializer.data)
   
